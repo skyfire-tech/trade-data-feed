@@ -4,32 +4,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  update:
+  test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check Secret Presence
         run: |
           if [ -n "${{ secrets.APPS_SCRIPT_URL }}" ]; then
-            echo "APPS_SCRIPT_URL: FOUND"
+            echo "APPS_SCRIPT_URL FOUND"
           else
-            echo "APPS_SCRIPT_URL: MISSING"
+            echo "APPS_SCRIPT_URL MISSING"
           fi
 
           if [ -n "${{ secrets.API_TOKEN }}" ]; then
-            echo "API_TOKEN: FOUND"
+            echo "API_TOKEN FOUND"
           else
-            echo "API_TOKEN: MISSING"
+            echo "API_TOKEN MISSING"
           fi
-
-      - name: Show URL Length
-        run: |
-          echo "${{ secrets.APPS_SCRIPT_URL }}" | wc -c
-
-      - name: Test URL Fetch
-        run: |
-          curl -L "${{ secrets.APPS_SCRIPT_URL }}?token=${{ secrets.API_TOKEN }}" -o data.json
-
-      - name: Verify JSON
-        run: |
-          python -m json.tool data.json
