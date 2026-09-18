@@ -1,35 +1,35 @@
 name: Update Trade Feed
 
 on:
-  schedule:
-    - cron: "*/5 * * * *"
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   update:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Check Secret Presence
+        run: |
+          if [ -n "${{ secrets.APPS_SCRIPT_URL }}" ]; then
+            echo "APPS_SCRIPT_URL: FOUND"
+          else
+            echo "APPS_SCRIPT_URL: MISSING"
+          fi
 
-      - name: Download feed
-        run: curl -L "${{ secrets.APPS_SCRIPT_URL }}?token=${{ secrets.API_TOKEN }}" -o data.json
+          if [ -n "${{ secrets.API_TOKEN }}" ]; then
+            echo "API_TOKEN: FOUND"
+          else
+            echo "API_TOKEN: MISSING"
+          fi
+
+      - name: Show URL Length
+        run: |
+          echo "${{ secrets.APPS_SCRIPT_URL }}" | wc -c
+
+      - name: Test URL Fetch
+        run: |
+          curl -L "${{ secrets.APPS_SCRIPT_URL }}?token=${{ secrets.API_TOKEN }}" -o data.json
 
       - name: Verify JSON
-        run: python -m json.tool data.json > /dev/null
-
-      - name: Commit changes
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-
-          git add data.json
-
-          git diff --staged --quiet || (
-            git commit -m "Update trade feed"
-            git push
-          )
+          python -m json.tool data.json
