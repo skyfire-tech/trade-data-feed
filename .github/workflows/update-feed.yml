@@ -16,11 +16,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download JSON feed
+      - name: Download feed
         run: |
-          curl -L "YOUR_APPS_SCRIPT_URL" -o data.json
+          curl -L \
+          "${{ secrets.APPS_SCRIPT_URL }}?token=${{ secrets.API_TOKEN }}" \
+          -o data.json
 
-      - name: Commit changes if data changed
+      - name: Verify JSON
+        run: |
+          python -m json.tool data.json > /dev/null
+
+      - name: Commit changes
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
